@@ -1,7 +1,6 @@
 package co.casterlabs.youtubeapijava;
 
 import java.io.IOException;
-import java.net.URLEncoder;
 
 import co.casterlabs.apiutil.auth.ApiAuthException;
 import co.casterlabs.apiutil.auth.AuthProvider;
@@ -15,7 +14,6 @@ import lombok.ToString;
 import okhttp3.Request.Builder;
 import okhttp3.Response;
 
-@SuppressWarnings("deprecation")
 public class YoutubeAuth extends AuthProvider {
     private @Getter String apiKey;
 
@@ -61,9 +59,9 @@ public class YoutubeAuth extends AuthProvider {
                     + "&refresh_token=%s"
                     + "&client_id=%s"
                     + "&client_secret=%s",
-                URLEncoder.encode(this.refreshToken),
-                URLEncoder.encode(this.clientId),
-                URLEncoder.encode(this.clientSecret)
+                HttpUtil.encodeURIComponent(this.refreshToken),
+                HttpUtil.encodeURIComponent(this.clientId),
+                HttpUtil.encodeURIComponent(this.clientSecret)
             );
 
             try (Response response = HttpUtil.sendHttp(form, "https://oauth2.googleapis.com/token", null, "application/x-www-form-urlencoded")) {
@@ -107,10 +105,10 @@ public class YoutubeAuth extends AuthProvider {
                 + "&redirect_uri=%s"
                 + "&client_id=%s"
                 + "&client_secret=%s",
-            URLEncoder.encode(code),
-            URLEncoder.encode(redirectUri),
-            URLEncoder.encode(clientId),
-            URLEncoder.encode(clientSecret)
+            HttpUtil.encodeURIComponent(code),
+            HttpUtil.encodeURIComponent(redirectUri),
+            HttpUtil.encodeURIComponent(clientId),
+            HttpUtil.encodeURIComponent(clientSecret)
         );
 
         try (Response response = HttpUtil.sendHttp(form, "https://oauth2.googleapis.com/token", null, "application/x-www-form-urlencoded")) {
@@ -138,10 +136,10 @@ public class YoutubeAuth extends AuthProvider {
                 + "&prompt=consent"
                 + "&access_type=offline"
                 + "&client_id=%s",
-            URLEncoder.encode(scope),
-            URLEncoder.encode(state),
-            URLEncoder.encode(redirectUri),
-            URLEncoder.encode(clientId)
+            HttpUtil.encodeURIComponent(scope),
+            HttpUtil.encodeURIComponent(state),
+            HttpUtil.encodeURIComponent(redirectUri),
+            HttpUtil.encodeURIComponent(clientId)
         );
     }
 

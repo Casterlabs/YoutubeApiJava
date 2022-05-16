@@ -1,12 +1,14 @@
 package co.casterlabs.youtubeapijava;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
 import org.jetbrains.annotations.Nullable;
 
 import co.casterlabs.apiutil.auth.ApiAuthException;
 import lombok.NonNull;
+import lombok.SneakyThrows;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -63,6 +65,17 @@ public class HttpUtil {
         Response response = client.newCall(request).execute();
 
         return response;
+    }
+
+    @SneakyThrows
+    public static String encodeURIComponent(@NonNull String s) {
+        return URLEncoder.encode(s, "UTF-8")
+            .replaceAll("\\+", "%20")
+            .replaceAll("\\%21", "!")
+            .replaceAll("\\%27", "'")
+            .replaceAll("\\%28", "(")
+            .replaceAll("\\%29", ")")
+            .replaceAll("\\%7E", "~");
     }
 
 }

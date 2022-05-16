@@ -1,8 +1,6 @@
 package co.casterlabs.youtubeapijava.requests;
 
 import java.io.IOException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 
 import co.casterlabs.apiutil.auth.ApiAuthException;
 import co.casterlabs.apiutil.web.ApiException;
@@ -48,7 +46,7 @@ public class YoutubeGetLiveBroadcastSnippetRequest extends AuthenticatedWebReque
 
         switch (this.queryMode) {
             case 0: {
-                url += String.format("&id=%s", URLEncoder.encode(this.queryData, StandardCharsets.UTF_8));
+                url += String.format("&id=%s", HttpUtil.encodeURIComponent(this.queryData));
                 break;
             }
 

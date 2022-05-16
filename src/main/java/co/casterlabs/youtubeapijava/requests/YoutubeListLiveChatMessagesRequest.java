@@ -1,8 +1,6 @@
 package co.casterlabs.youtubeapijava.requests;
 
 import java.io.IOException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -36,10 +34,10 @@ public class YoutubeListLiveChatMessagesRequest extends AuthenticatedWebRequest<
             + "?part=snippet%2CauthorDetails"
             + "&profileImageSize=88"
             + "&maxResults=2000"
-            + "&liveChatId=" + URLEncoder.encode(this.liveChatId, StandardCharsets.UTF_8);
+            + "&liveChatId=" + HttpUtil.encodeURIComponent(this.liveChatId);
 
         if (this.pageToken != null) {
-            url += "&pageToken=" + URLEncoder.encode(this.pageToken, StandardCharsets.UTF_8);
+            url += "&pageToken=" + HttpUtil.encodeURIComponent(this.pageToken);
         }
 
         try (Response response = HttpUtil.sendHttpGet(url, this.auth)) {
