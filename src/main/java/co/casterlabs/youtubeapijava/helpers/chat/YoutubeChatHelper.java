@@ -5,9 +5,10 @@ import co.casterlabs.youtubeapijava.requests.YoutubeListLiveChatMessagesRequest;
 import co.casterlabs.youtubeapijava.types.YoutubeLiveChatMessagesList;
 import co.casterlabs.youtubeapijava.types.livechat.YoutubeLiveChatEvent;
 import lombok.NonNull;
+import lombok.Getter;
 
 public class YoutubeChatHelper {
-    private String liveChatId;
+    private @Getter String liveChatId;
     private YoutubeAuth auth;
     private YoutubeChatListener listener;
 
