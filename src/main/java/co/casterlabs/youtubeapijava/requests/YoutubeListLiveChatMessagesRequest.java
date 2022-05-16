@@ -7,6 +7,7 @@ import org.jetbrains.annotations.Nullable;
 import co.casterlabs.apiutil.auth.ApiAuthException;
 import co.casterlabs.apiutil.web.ApiException;
 import co.casterlabs.apiutil.web.AuthenticatedWebRequest;
+import co.casterlabs.rakurai.json.element.JsonObject;
 import co.casterlabs.rakurai.json.serialization.JsonParseException;
 import co.casterlabs.youtubeapijava.HttpUtil;
 import co.casterlabs.youtubeapijava.YoutubeApi;
@@ -44,7 +45,11 @@ public class YoutubeListLiveChatMessagesRequest extends AuthenticatedWebRequest<
             String body = response.body().string();
 
             if (response.code() == 200) {
-                return YoutubeApi.RSON.fromJson(body, YoutubeLiveChatMessagesList.class);
+                JsonObject json = YoutubeApi.RSON.fromJson(body, JsonObject.class);
+
+                json.put("isHistorical", this.pageToken == null);
+
+                return YoutubeApi.RSON.fromJson(json, YoutubeLiveChatMessagesList.class);
             } else {
                 throw new ApiException(body);
             }
