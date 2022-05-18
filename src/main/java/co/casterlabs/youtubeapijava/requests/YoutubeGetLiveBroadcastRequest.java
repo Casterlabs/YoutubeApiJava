@@ -12,36 +12,36 @@ import co.casterlabs.rakurai.json.serialization.JsonParseException;
 import co.casterlabs.youtubeapijava.HttpUtil;
 import co.casterlabs.youtubeapijava.YoutubeApi;
 import co.casterlabs.youtubeapijava.YoutubeAuth;
-import co.casterlabs.youtubeapijava.types.YoutubeLiveBroadcastSnippet;
+import co.casterlabs.youtubeapijava.types.YoutubeLiveBroadcastData;
 import lombok.NonNull;
 import okhttp3.Response;
 
-public class YoutubeGetLiveBroadcastSnippetRequest extends AuthenticatedWebRequest<YoutubeLiveBroadcastSnippet, YoutubeAuth> {
+public class YoutubeGetLiveBroadcastRequest extends AuthenticatedWebRequest<YoutubeLiveBroadcastData, YoutubeAuth> {
     private int queryMode = -1; // id, mine
     private String queryData = null;
 
-    public YoutubeGetLiveBroadcastSnippetRequest(@NonNull YoutubeAuth auth) {
+    public YoutubeGetLiveBroadcastRequest(@NonNull YoutubeAuth auth) {
         super(auth);
     }
 
-    public YoutubeGetLiveBroadcastSnippetRequest byId(@NonNull String channelId) {
+    public YoutubeGetLiveBroadcastRequest byId(@NonNull String channelId) {
         this.queryMode = 0;
         this.queryData = channelId;
         return this;
     }
 
-    public YoutubeGetLiveBroadcastSnippetRequest mine() {
+    public YoutubeGetLiveBroadcastRequest mine() {
         this.queryMode = 1;
         this.queryData = null;
         return this;
     }
 
     @Override
-    protected YoutubeLiveBroadcastSnippet execute() throws ApiException, ApiAuthException, IOException {
+    protected YoutubeLiveBroadcastData execute() throws ApiException, ApiAuthException, IOException {
         assert this.queryMode != -1 : "You must specify a query either by ID or mine.";
 
         String url = "https://youtube.googleapis.com/youtube/v3/liveBroadcasts"
-            + "?part=snippet"
+            + "?part=snippet,status"
             + "&broadcastStatus=all";
 
         switch (this.queryMode) {
@@ -73,10 +73,12 @@ public class YoutubeGetLiveBroadcastSnippetRequest extends AuthenticatedWebReque
 
                 JsonObject item = items.getObject(0);
 
-                JsonObject snippet = item.getObject("snippet");
-                snippet.put("id", item.get("id"));
+                // Inject the ID into the snippet.
+                item
+                    .getObject("snippet")
+                    .put("id", item.getString("id"));
 
-                return YoutubeApi.RSON.fromJson(snippet, YoutubeLiveBroadcastSnippet.class);
+                return YoutubeApi.RSON.fromJson(item, YoutubeLiveBroadcastData.class);
             } else {
                 throw new ApiException(body);
             }
