@@ -44,7 +44,7 @@ public class YoutubeListLiveChatMessagesRequest extends AuthenticatedWebRequest<
         try (Response response = HttpUtil.sendHttpGet(url, this.auth)) {
             String body = response.body().string();
 
-            if (response.code() == 200) {
+            if (response.isSuccessful()) {
                 JsonObject json = YoutubeApi.RSON.fromJson(body, JsonObject.class);
 
                 json.put("isHistorical", this.pageToken == null);

@@ -73,7 +73,7 @@ public class YoutubeGetChannelSnippetRequest extends AuthenticatedWebRequest<You
         try (Response response = HttpUtil.sendHttpGet(url, this.auth)) {
             String body = response.body().string();
 
-            if (response.code() == 200) {
+            if (response.isSuccessful()) {
                 JsonObject json = Rson.DEFAULT.fromJson(body, JsonObject.class);
                 JsonArray items = json.getArray("items");
 
