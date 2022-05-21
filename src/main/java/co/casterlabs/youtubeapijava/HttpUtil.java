@@ -28,7 +28,7 @@ public class HttpUtil {
     public static Response sendHttp(@Nullable RequestBody body, @Nullable String type, @NonNull String address, @Nullable YoutubeAuth auth, @Nullable String mime) throws IOException {
         Request.Builder builder = new Request.Builder().url(address);
 
-        if ((body != null) && (type != null)) {
+        if (type != null) {
             switch (type.toUpperCase()) {
                 case "POST": {
                     builder.post(body);
@@ -42,6 +42,15 @@ public class HttpUtil {
 
                 case "PATCH": {
                     builder.patch(body);
+                    break;
+                }
+
+                case "DELETE": {
+                    builder.delete();
+                    break;
+                }
+
+                case "GET": {
                     break;
                 }
             }
