@@ -48,7 +48,7 @@ public class YoutubeInsertLiveChatMessageRequest extends AuthenticatedWebRequest
                         .put(
                             "textMessageDetails",
                             new JsonObject()
-                                .put("messageText", this.liveChatId)
+                                .put("messageText", this.messageText)
                         )
                 )
                 .toString()
