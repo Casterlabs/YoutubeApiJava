@@ -1,11 +1,12 @@
 package co.casterlabs.youtubeapijava.helpers.chat;
 
+import co.casterlabs.apiutil.web.ApiException;
 import co.casterlabs.youtubeapijava.YoutubeAuth;
 import co.casterlabs.youtubeapijava.requests.YoutubeListLiveChatMessagesRequest;
 import co.casterlabs.youtubeapijava.types.YoutubeLiveChatMessagesList;
 import co.casterlabs.youtubeapijava.types.livechat.YoutubeLiveChatEvent;
-import lombok.NonNull;
 import lombok.Getter;
+import lombok.NonNull;
 
 public class YoutubeChatHelper {
     private @Getter String liveChatId;
@@ -69,6 +70,13 @@ public class YoutubeChatHelper {
 
             this.paginationToken = list.getNextPageToken();
             Thread.sleep(list.getPollingIntervalMillis());
+        } catch (ApiException e) {
+            this.shouldLoop = false;
+            if (e.getMessage().contains("The live chat that you are trying to retrieve cannot be found. Check the value of the request's")) {
+                listener.onClose();
+            } else {
+                listener.onError(e);
+            }
         } catch (Throwable t) {
             this.shouldLoop = false;
             listener.onError(t);
@@ -79,7 +87,6 @@ public class YoutubeChatHelper {
         return this.shouldLoop;
     }
 
-    @SuppressWarnings("deprecated")
     public void stop() {
         this.shouldLoop = false;
     }
