@@ -34,7 +34,7 @@ public class YoutubeListLiveChatMessagesRequest extends AuthenticatedWebRequest<
         String url = "https://youtube.googleapis.com/youtube/v3/liveChat/messages"
             + "?part=snippet%2CauthorDetails"
             + "&profileImageSize=88"
-            + "&maxResults=2000"
+//            + "&maxResults=2000"
             + "&liveChatId=" + HttpUtil.encodeURIComponent(this.liveChatId);
 
         if (this.pageToken != null) {
