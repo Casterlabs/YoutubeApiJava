@@ -1,5 +1,6 @@
 package co.casterlabs.youtubeapijava.unsupported.chat;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.lang.ProcessBuilder.Redirect;
@@ -15,10 +16,10 @@ public class YoutubeChatScraper {
     private static final boolean isRunningOnWindows = System.getProperty("os.name", "").contains("Windows");
     private static File targetLocation = null;
 
-    public static void listen(@NonNull String liveChatId, @NonNull YoutubeScrapeChatListener listener) throws IOException {
+    public static Closeable listen(@NonNull String liveChatId, @NonNull YoutubeScrapeChatListener listener) throws IOException {
         assert targetLocation != null : "You must call setupEnvironment() before calling listen().";
 
-        Process process = execute(true, "node", "wrapper.mjs", liveChatId);
+        Process process = execute("node", "wrapper.mjs", liveChatId);
 
         Thread readThread = new Thread(() -> {
             try (Scanner in = new Scanner(process.getInputStream())) {
@@ -52,7 +53,13 @@ public class YoutubeChatScraper {
                             JsonObject data = packet.getObject("data");
                             String error = data.getString("error");
 
-                            listener.onError(error);
+                            if (error.equals("Error: Request failed with status code 404")) {
+                                process.destroy();
+                                // Stream is over.
+                                listener.onEnd("Stream is over");
+                            } else {
+                                listener.onError(error);
+                            }
                             break;
                         }
                     }
@@ -63,6 +70,11 @@ public class YoutubeChatScraper {
         });
         readThread.setName("ScrapeChat Read Thread: " + liveChatId);
         readThread.start();
+
+        return () -> {
+            process.destroy();
+            listener.onEnd("Closed by user");
+        };
     }
 
     public static void setupEnvironment(@NonNull File targetLocation) throws IOException, InterruptedException {
@@ -72,7 +84,7 @@ public class YoutubeChatScraper {
         final File wrapperFile = new File(targetLocation, "wrapper.mjs");
         wrapperFile.delete();
 
-        execute(false, "npm", "i", "youtube-chat").waitFor();
+        execute("npm", "i", "youtube-chat").waitFor();
 
         Files.copy(
             YoutubeChatScraper.class.getClassLoader().getResourceAsStream("wrapper.mjs"),
@@ -81,7 +93,7 @@ public class YoutubeChatScraper {
 
     }
 
-    private static Process execute(boolean keepOutput, String... cmd) throws IOException {
+    private static Process execute(String... cmd) throws IOException {
         String[] commandLine;
 
         if (isRunningOnWindows) {
@@ -101,8 +113,8 @@ public class YoutubeChatScraper {
         return new ProcessBuilder(commandLine)
             .directory(targetLocation)
             .redirectError(Redirect.INHERIT)
-            .redirectInput(Redirect.PIPE)
-            .redirectOutput(keepOutput ? Redirect.PIPE : Redirect.DISCARD)
+            .redirectInput(Redirect.PIPE) // Unused.
+            .redirectOutput(Redirect.PIPE)
             .start();
     }
 
