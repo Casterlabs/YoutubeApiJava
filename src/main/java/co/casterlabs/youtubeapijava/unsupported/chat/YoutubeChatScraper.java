@@ -16,10 +16,10 @@ public class YoutubeChatScraper {
     private static final boolean isRunningOnWindows = System.getProperty("os.name", "").contains("Windows");
     private static File targetLocation = null;
 
-    public static Closeable listen(@NonNull String liveChatId, @NonNull YoutubeScrapeChatListener listener) throws IOException {
+    public static Closeable listen(@NonNull String channelId, @NonNull YoutubeScrapeChatListener listener) throws IOException {
         assert targetLocation != null : "You must call setupEnvironment() before calling listen().";
 
-        Process process = execute("node", "wrapper.mjs", liveChatId);
+        Process process = execute("node", "wrapper.mjs", channelId);
 
         Thread readThread = new Thread(() -> {
             try (Scanner in = new Scanner(process.getInputStream())) {
@@ -68,7 +68,7 @@ public class YoutubeChatScraper {
                 e.printStackTrace();
             }
         });
-        readThread.setName("ScrapeChat Read Thread: " + liveChatId);
+        readThread.setName("ScrapeChat Read Thread: " + channelId);
         readThread.start();
 
         return () -> {
