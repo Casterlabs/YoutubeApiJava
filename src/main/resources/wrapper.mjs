@@ -2,7 +2,7 @@ import { LiveChat } from "youtube-chat";
 
 const ID = process.argv[2];
 
-const liveChat = new LiveChat({ channelId: ID });
+const liveChat = new LiveChat({ liveId: ID });
 let startTime = null;
 
 function sendMessage(type, data = null) {

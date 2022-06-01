@@ -16,10 +16,10 @@ public class YoutubeChatScraper {
     private static final boolean isRunningOnWindows = System.getProperty("os.name", "").contains("Windows");
     private static File targetLocation = null;
 
-    public static Closeable listen(@NonNull String channelId, @NonNull YoutubeScrapeChatListener listener) throws IOException {
+    public static Closeable listen(@NonNull String videoId, @NonNull YoutubeScrapeChatListener listener) throws IOException {
         assert targetLocation != null : "You must call setupEnvironment() before calling listen().";
 
-        Process process = execute("node", "wrapper.mjs", channelId);
+        Process process = execute("node", "wrapper.mjs", videoId);
 
         Thread readThread = new Thread(() -> {
             try (Scanner in = new Scanner(process.getInputStream())) {
@@ -57,6 +57,10 @@ public class YoutubeChatScraper {
                                 process.destroy();
                                 // Stream is over.
                                 listener.onEnd("Stream is over");
+                            } else if (error.equals("Error: Live Stream was not found")) {
+                                process.destroy();
+                                // Stream is over.
+                                listener.onEnd("No stream");
                             } else {
                                 listener.onError(error);
                             }
@@ -68,7 +72,7 @@ public class YoutubeChatScraper {
                 e.printStackTrace();
             }
         });
-        readThread.setName("ScrapeChat Read Thread: " + channelId);
+        readThread.setName("ScrapeChat Read Thread: " + videoId);
         readThread.start();
 
         return () -> {
